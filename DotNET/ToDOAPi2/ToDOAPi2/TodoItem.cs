@@ -1,10 +1,13 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ToDOAPi2 {
 
     public class TodoItem {
         public uint ItemId { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public bool IsCompleted { get; set; }
 
 
