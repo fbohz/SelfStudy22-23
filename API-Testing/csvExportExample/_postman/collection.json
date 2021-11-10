@@ -1,0 +1,733 @@
+{
+	"info": {
+		"_postman_id": "6aaf136a-7431-4603-988a-d79719272218",
+		"name": "CORE-921-FEAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "public",
+			"item": [
+				{
+					"name": "/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Request matches expected keys\", function(){",
+									"   const req = JSON.parse(pm.request.body);",
+									"",
+									"   const expectedKeys = ['userName', 'password'];",
+									"",
+									"   expectedKeys.map(key => {",
+									"       pm.expect(req).haveOwnProperty(key)",
+									"   })",
+									"",
+									"});",
+									"",
+									"pm.test(\"Confirm userName and userPassword fields have been populated\", function(){",
+									"",
+									"    const userName = pm.environment.get('userName');",
+									"    const userPassword = pm.environment.get('userPassword');",
+									"",
+									"    postman.setNextRequest(null);",
+									"    pm.expect(userName).not.eq(\"\");",
+									"    pm.expect(userName).not.eq(undefined);",
+									"    pm.expect(userPassword).not.eq(\"\");",
+									"    pm.expect(userPassword).not.eq(undefined);",
+									"    // if the test fails collection running will stop",
+									"    postman.setNextRequest();",
+									"",
+									"});",
+									"",
+									"",
+									"",
+									"",
+									"// set authToken from res",
+									"const jsonData = pm.response.json();",
+									"pm.environment.set('authToken', jsonData.token)",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response matches expected keys\", function(){",
+									"   const res = pm.response.json();",
+									"   const expectedKeys = ['token']",
+									"",
+									"   pm.expect(res).to.have.keys(expectedKeys)  ",
+									"});",
+									"",
+									"// Currently going to: /api/alarms ",
+									"// postman.setNextRequest(\"8a4a5064-5a6f-4b4f-8e1d-d1ee4c62b440\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"keepSignedIn\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userName\": \"sample@bgrove.com\",\n    \"password\": \"password\",\n    \"keepSignedIn\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "alarms",
+			"item": [
+				{
+					"name": "/api/alarms",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log(pm.response.json().length)",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response matches expected keys for all alarms\", function(){",
+									"    const res = pm.response.json();",
+									"    const expectedKeys = ['name', \"type\", \"conditions\", \"alarmid\", \"parentid\", \"active\"]",
+									"    const checkExpectedKeys = (obj) => {",
+									"            for (let key of expectedKeys) {",
+									"                pm.expect(obj).haveOwnProperty(key)",
+									"            }",
+									"    }",
+									"",
+									"    if (res.length < 50) {",
+									"        res.map(obj => {",
+									"            checkExpectedKeys(obj);",
+									"        }) ",
+									"        ",
+									"    } else {",
+									"        // Guard if res is too big.",
+									"        let counter = 0;",
+									"        while (counter <= res.length){",
+									"            res.map(obj => {",
+									"                checkExpectedKeys(obj);",
+									"                counter++;",
+									"            }) ",
+									"        }",
+									"    }",
+									"",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/alarms?groupId=86163512",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"alarms"
+									],
+									"query": [
+										{
+											"key": "groupId",
+											"value": "86163512"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/api/alarms",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Request matches baseline alarm keys\", function(){",
+									"    const req = JSON.parse(pm.request.body);",
+									"",
+									"    const expectedKeys = ['name', \"type\", \"conditions\"]",
+									"",
+									"    expectedKeys.map(key => {",
+									"       pm.expect(req).haveOwnProperty(key)",
+									"    })",
+									"",
+									"});",
+									"",
+									"",
+									"const baseUrl = pm.environment.get('baseUrl');",
+									"const token = pm.environment.get('authToken')",
+									"",
+									"const getRequest = {",
+									"  url: `${baseUrl}/api/alarms`,",
+									"  method: 'GET',",
+									"  header: {",
+									"    'Authorization': token,",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"  body: {}",
+									"};",
+									"",
+									"pm.test(\"Saves applicable environment variables temp Alarm resource\", function(){",
+									"    pm.sendRequest(getRequest, (error, response) => {",
+									"",
+									"    if (response) {",
+									"        pm.sendRequest(getRequest, (error, response) => {",
+									"        const jsonRes = response.json();  ",
+									"        const justCreatedResource = jsonRes[jsonRes.length - 1]",
+									"        pm.environment.set('resourceId', justCreatedResource.alarmid)",
+									"        pm.environment.set('tempResource', justCreatedResource)",
+									"        });",
+									"    }",
+									"    });",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"type\": \"Activity\",\n        \"active\": false,\n        \"conditions\": [\n            {\n                \"id\": 0,\n                \"field\": \"Url\",\n                \"op\": \"Contains\",\n                \"opName\": \"Contains\",\n                \"value\": \"vimeo\",\n                \"casesensitive\": false,\n                \"fieldName\": \"Url\"\n            }\n        ],\n        \"orflag\": true,\n        \"screenshot\": false,\n        \"screenshotmultiple\": false,\n        \"screenshotsec\": 10,\n        \"popup\": false,\n        \"popuptext\": \"\",\n        \"email\": false,\n        \"emailto\": null,\n        \"emailsubject\": \"\",\n        \"emailbody\": \"\",\n        \"emailbounced\": false,\n        \"groups\": null,\n        \"groupNames\": null,\n        \"terminate\": false,\n        \"name\": \"_atomatedTesting\",\n        \"webhook\": false,\n        \"webhookurl\": \"\",\n        \"webhookprovider\": null,\n        \"webhookparam\": \"\",\n        \"weight\": 3,\n        \"video\": false,\n        \"conditionstext\": \"(Url Contains vimeo)\",\n        \"default\": false,\n        \"isUsb\": false,\n        \"allowedFields\": [\n            \"Computer\",\n            \"Description\",\n            \"DurationSeconds\",\n            \"Executable\",\n            \"IpAddress\",\n            \"LogonDomain\",\n            \"PrimaryDomain\",\n            \"Titlebar\",\n            \"Url\",\n            \"User\"\n        ]\n    }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"type\": 2,\n    \"alarmid\": -74079764,\n    \"parentid\": 51829186,\n    \"active\": true,\n    \"conditions\": [\n        {\n            \"id\": -74906518,\n            \"field\": 4,\n            \"op\": 3,\n            \"opName\": \"mollit in fugiat ad\",\n            \"value\": \"sint laboris in\",\n            \"casesensitive\": false,\n            \"fieldName\": \"sed\"\n        },\n        {\n            \"id\": -68772114,\n            \"field\": 11,\n            \"op\": 2,\n            \"opName\": \"laborum cillum ut\",\n            \"value\": \"Excepteur culpa ad\",\n            \"casesensitive\": false,\n            \"fieldName\": \"consequat nostrud in adipisicing\"\n        }\n    ],\n    \"orflag\": true,\n    \"screenshot\": false,\n    \"screenshotmultiple\": false,\n    \"screenshotsec\": 11742892,\n    \"popup\": true,\n    \"popuptext\": \"aute dolor anim cup\",\n    \"email\": true,\n    \"emailto\": [\n        \"aute\",\n        \"commodo aliqu\"\n    ],\n    \"emailsubject\": \"sit labore ea\",\n    \"emailbody\": \"ullamco amet anim in\",\n    \"emailbounced\": false,\n    \"groups\": [\n        \"qui do voluptate nisi\",\n        \"in laborum qui esse ex\"\n    ],\n    \"groupNames\": \"eu\",\n    \"terminate\": false,\n    \"name\": \"mollit reprehenderit amet\",\n    \"webhook\": true,\n    \"webhookurl\": \"in commodo dolore\",\n    \"webhookprovider\": \"ea magna incididunt\",\n    \"webhookparam\": \"ut sunt\",\n    \"weight\": -32650581,\n    \"video\": false,\n    \"default\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/alarms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"alarms"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/api/alarms/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Ensure alarm id is populated\", function(){",
+									"",
+									"    const resourceId = pm.environment.get('resourceId');",
+									"    pm.expect(resourceId).not.eq(\"\");",
+									"    pm.expect(resourceId).not.eq(undefined);",
+									"",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response matches baseline alarm keys\", function(){",
+									"",
+									"   const res = pm.response.json()[0];",
+									"   const expectedKeys = ['name', \"type\", \"conditions\", \"alarmid\", \"parentid\", \"active\"]",
+									"",
+									"    expectedKeys.map(key => {",
+									"       pm.expect(res).haveOwnProperty(key)",
+									"    })",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/alarms/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"alarms",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/api/alarms",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"const oldResource = pm.environment.get('tempResource')",
+									"const resourceId = pm.environment.get('resourceId')",
+									"",
+									"const res = pm.response.json()",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Saves updated alarmid into env variable\", function(){",
+									"    pm.environment.set('resourceId', res.id)",
+									"})",
+									"",
+									"const baseUrl = pm.environment.get('baseUrl');",
+									"const token = pm.environment.get('authToken');",
+									"",
+									"const recentlyUpdated = {",
+									"    url: `${baseUrl}/api/alarms/${resourceId}`,",
+									"    method: 'GET',",
+									"    header: {",
+									"        'Authorization': token,",
+									"        'Content-Type': 'application/json',",
+									"    },",
+									"    body: {}",
+									"};",
+									"",
+									"pm.sendRequest(recentlyUpdated, (error, response) => {",
+									"    const updatedResource = response.json()[0];",
+									"    pm.test(\"Updated alarm resource matches expected resource\", function(){",
+									"        pm.expect(res.id).to.eql(updatedResource.alarmid);",
+									"    })",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"type\": \"Activity\",\n        \"alarmid\": {{resourceId}},\n        \"active\": true,\n        \"conditions\": [\n            {\n                \"id\": 0,\n                \"field\": \"Url\",\n                \"op\": \"Contains\",\n                \"opName\": \"Contains\",\n                \"value\": \"5\",\n                \"casesensitive\": false,\n                \"fieldName\": \"Url\"\n            }\n        ],\n        \"orflag\": true,\n        \"screenshot\": false,\n        \"screenshotmultiple\": false,\n        \"screenshotsec\": 10,\n        \"popup\": false,\n        \"popuptext\": \"\",\n        \"email\": false,\n        \"emailto\": null,\n        \"emailsubject\": \"\",\n        \"emailbody\": \"\",\n        \"emailbounced\": false,\n        \"groups\": null,\n        \"groupNames\": null,\n        \"terminate\": false,\n        \"name\": \"_atomatedTesting\",\n        \"webhook\": false,\n        \"webhookurl\": \"\",\n        \"webhookprovider\": null,\n        \"webhookparam\": \"\",\n        \"weight\": 3,\n        \"video\": false,\n        \"conditionstext\": \"(Url Contains updated)\",\n        \"default\": false,\n        \"isUsb\": false,\n        \"allowedFields\": [\n            \"Computer\",\n            \"Description\",\n            \"DurationSeconds\",\n            \"Executable\",\n            \"IpAddress\",\n            \"LogonDomain\",\n            \"PrimaryDomain\",\n            \"Titlebar\",\n            \"Url\",\n            \"User\"\n        ]\n    }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"type\": 2,\n    \"alarmid\": -74079764,\n    \"parentid\": 51829186,\n    \"active\": true,\n    \"conditions\": [\n        {\n            \"id\": -74906518,\n            \"field\": 4,\n            \"op\": 3,\n            \"opName\": \"mollit in fugiat ad\",\n            \"value\": \"sint laboris in\",\n            \"casesensitive\": false,\n            \"fieldName\": \"sed\"\n        },\n        {\n            \"id\": -68772114,\n            \"field\": 11,\n            \"op\": 2,\n            \"opName\": \"laborum cillum ut\",\n            \"value\": \"Excepteur culpa ad\",\n            \"casesensitive\": false,\n            \"fieldName\": \"consequat nostrud in adipisicing\"\n        }\n    ],\n    \"orflag\": true,\n    \"screenshot\": false,\n    \"screenshotmultiple\": false,\n    \"screenshotsec\": 11742892,\n    \"popup\": true,\n    \"popuptext\": \"aute dolor anim cup\",\n    \"email\": true,\n    \"emailto\": [\n        \"aute\",\n        \"commodo aliqu\"\n    ],\n    \"emailsubject\": \"sit labore ea\",\n    \"emailbody\": \"ullamco amet anim in\",\n    \"emailbounced\": false,\n    \"groups\": [\n        \"qui do voluptate nisi\",\n        \"in laborum qui esse ex\"\n    ],\n    \"groupNames\": \"eu\",\n    \"terminate\": false,\n    \"name\": \"mollit reprehenderit amet\",\n    \"webhook\": true,\n    \"webhookurl\": \"in commodo dolore\",\n    \"webhookprovider\": \"ea magna incididunt\",\n    \"webhookparam\": \"ut sunt\",\n    \"weight\": -32650581,\n    \"video\": false,\n    \"default\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/alarms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"alarms"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/api/alarms/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response should not have errors\", function () {",
+									"    pm.response.to.not.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"Successful cleanup of environment variables for /alarms\", function () {",
+									"",
+									"    pm.environment.set('resourceId', '')",
+									"    pm.environment.set('tempResource', '')",
+									"",
+									"    const tempResource = pm.environment.get('tempResource')",
+									"    const resourceId = pm.environment.get('resourceId')",
+									"",
+									"    pm.expect(tempResource).to.eq(\"\");",
+									"    pm.expect(resourceId).to.eq(\"\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/alarms/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"alarms",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{authToken}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "Authorization",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"utils = {",
+					"  globalFnExample: function() {",
+					"    return 'hello';",
+					"  }",
+					"};"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/"
+		}
+	]
+}
