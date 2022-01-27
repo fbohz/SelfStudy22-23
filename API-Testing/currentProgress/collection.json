@@ -1,0 +1,1158 @@
+{
+	"info": {
+		"_postman_id": "fbe70bb4-ec36-4683-a51d-bf8577ecbeeb",
+		"name": "_Frontend API - MAIN",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "public",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login request matches expected keys\", function(){",
+									"   const req = JSON.parse(pm.request.body);",
+									"",
+									"   const expectedKeys = ['userName', 'password'];",
+									"",
+									"   utils.validateExpectedKeys(req, expectedKeys);",
+									"   ",
+									"});",
+									"",
+									"pm.test(\"Confirm userName and userPassword fields have been populated\", function(){",
+									"",
+									"    const userName = pm.environment.get('userName');",
+									"    const userPassword = pm.environment.get('userPassword');",
+									"",
+									"    postman.setNextRequest(null);",
+									"    pm.expect(userName).not.eq(\"\");",
+									"    pm.expect(userName).not.eq(undefined);",
+									"    pm.expect(userPassword).not.eq(\"\");",
+									"    pm.expect(userPassword).not.eq(undefined);",
+									"    // if the test fails collection running will stop",
+									"    postman.setNextRequest();",
+									"",
+									"});",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Login response matches expected keys\", function(){",
+									"   const res = pm.response.json();",
+									"   const expectedKeys = ['token']",
+									"",
+									"   pm.expect(res).to.have.keys(expectedKeys)  ",
+									"});",
+									"",
+									"pm.test(\"Set authToken from response\", function(){",
+									"    const jsonData = pm.response.json();",
+									"    pm.environment.set('authToken', jsonData.token)",
+									"});",
+									"",
+									"// Currently going to: /api/alarms ",
+									"// postman.setNextRequest(\"8a4a5064-5a6f-4b4f-8e1d-d1ee4c62b440\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.test(\"Token cleanup if token is pre-populated (ensures always fresh token on run)\", function(){",
+									"",
+									"    const authToken = pm.environment.get('authToken');",
+									"",
+									"    if (authToken) {",
+									"        pm.environment.set('authToken', '')",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\": \"{{userName}}\",\n    \"password\": \"{{userPassword}}\",\n    \"keepSignedIn\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "api/post_login",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/post_login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"post_login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "alarms",
+			"item": [
+				{
+					"name": "api/alarms",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// console.log(pm.response.json().length)",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response matches expected keys for all alarms\", function(){",
+									"    const res = pm.response.json();",
+									"    const expectedKeys = ['allowedFields', \"type\", \"conditions\", \"alarmid\", \"parentid\", \"active\"]",
+									"\tutils.validateLargeSampleLimit(res, 50, expectedKeys);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/alarms?groupId=86163512",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"alarms"
+									],
+									"query": [
+										{
+											"key": "groupId",
+											"value": "86163512"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "api/alarms",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Request matches baseline alarm keys\", function(){",
+									"    const req = JSON.parse(pm.request.body);",
+									"",
+									"    const expectedKeys = ['name', \"type\", \"conditions\"]",
+									"\tutils.validateExpectedKeys(req, expectedKeys);",
+									"});",
+									"",
+									"",
+									"const baseUrl = pm.environment.get('baseUrl');",
+									"const token = pm.environment.get('authToken')",
+									"",
+									"const getRequest = {",
+									"  url: `${baseUrl}/api/alarms`,",
+									"  method: 'GET',",
+									"  header: {",
+									"    'Authorization': token,",
+									"    'Content-Type': 'application/json',",
+									"  },",
+									"  body: {}",
+									"};",
+									"",
+									"pm.test(\"Saves applicable environment variables temp Alarm resource\", function(){",
+									"    pm.sendRequest(getRequest, (error, response) => {",
+									"",
+									"    if (response) {",
+									"        pm.sendRequest(getRequest, (error, response) => {",
+									"        const jsonRes = response.json();  ",
+									"        const justCreatedResource = jsonRes[jsonRes.length - 1]",
+									"        pm.environment.set('resourceId', justCreatedResource.alarmid)",
+									"        pm.environment.set('tempResource', justCreatedResource)",
+									"        });",
+									"    }",
+									"    });",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"type\": \"Activity\",\n        \"active\": false,\n        \"conditions\": [\n            {\n                \"id\": 0,\n                \"field\": \"Url\",\n                \"op\": \"Contains\",\n                \"opName\": \"Contains\",\n                \"value\": \"vimeo\",\n                \"casesensitive\": false,\n                \"fieldName\": \"Url\"\n            }\n        ],\n        \"orflag\": true,\n        \"screenshot\": false,\n        \"screenshotmultiple\": false,\n        \"screenshotsec\": 10,\n        \"popup\": false,\n        \"popuptext\": \"\",\n        \"email\": false,\n        \"emailto\": null,\n        \"emailsubject\": \"\",\n        \"emailbody\": \"\",\n        \"emailbounced\": false,\n        \"groups\": null,\n        \"groupNames\": null,\n        \"terminate\": false,\n        \"name\": \"_atomatedTesting\",\n        \"webhook\": false,\n        \"webhookurl\": \"\",\n        \"webhookprovider\": null,\n        \"webhookparam\": \"\",\n        \"weight\": 3,\n        \"video\": false,\n        \"conditionstext\": \"(Url Contains vimeo)\",\n        \"default\": false,\n        \"isUsb\": false,\n        \"allowedFields\": [\n            \"Computer\",\n            \"Description\",\n            \"DurationSeconds\",\n            \"Executable\",\n            \"IpAddress\",\n            \"LogonDomain\",\n            \"PrimaryDomain\",\n            \"Titlebar\",\n            \"Url\",\n            \"User\"\n        ]\n    }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/alarms/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Ensure alarm id is populated\", function(){",
+									"",
+									"    const resourceId = pm.environment.get('resourceId');",
+									"    pm.expect(resourceId).not.eq(\"\");",
+									"    pm.expect(resourceId).not.eq(undefined);",
+									"",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response matches baseline alarm keys\", function(){",
+									"",
+									"   const res = pm.response.json()[0];",
+									"   const expectedKeys = ['name', \"type\", \"conditions\", \"alarmid\", \"parentid\", \"active\"]",
+									"",
+									"    expectedKeys.map(key => {",
+									"       pm.expect(res).haveOwnProperty(key)",
+									"    })",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/alarmdetails/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Ensure alarm id is populated\", function(){",
+									"",
+									"    const resourceId = pm.environment.get('resourceId');",
+									"    pm.expect(resourceId).not.eq(\"\");",
+									"    pm.expect(resourceId).not.eq(undefined);",
+									"",
+									"});",
+									"",
+									"pm.test(\"Response matches baseline alarmdetails keys\", function(){",
+									"    const res = pm.response.json()[0];",
+									"",
+									"    const expectedKeys = ['type', \"alarmid\", \"conditions\", \"active\"]",
+									"\tutils.validateExpectedKeys(res, expectedKeys);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/alarmdetails/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarmdetails",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/alarms",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"const oldResource = pm.environment.get('tempResource')",
+									"const resourceId = pm.environment.get('resourceId')",
+									"",
+									"const res = pm.response.json()",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Saves updated alarmid into env variable\", function(){",
+									"    pm.environment.set('resourceId', res.id)",
+									"})",
+									"",
+									"const baseUrl = pm.environment.get('baseUrl');",
+									"const token = pm.environment.get('authToken');",
+									"",
+									"const recentlyUpdated = {",
+									"    url: `${baseUrl}/api/alarms/${resourceId}`,",
+									"    method: 'GET',",
+									"    header: {",
+									"        'Authorization': token,",
+									"        'Content-Type': 'application/json',",
+									"    },",
+									"    body: {}",
+									"};",
+									"",
+									"pm.sendRequest(recentlyUpdated, (error, response) => {",
+									"    const updatedResource = response.json()[0];",
+									"    pm.test(\"Updated alarm resource matches expected resource\", function(){",
+									"        pm.expect(res.id).to.eql(updatedResource.alarmid);",
+									"    })",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"type\": \"Activity\",\n        \"alarmid\": {{resourceId}},\n        \"active\": true,\n        \"conditions\": [\n            {\n                \"id\": 0,\n                \"field\": \"Url\",\n                \"op\": \"Contains\",\n                \"opName\": \"Contains\",\n                \"value\": \"5\",\n                \"casesensitive\": false,\n                \"fieldName\": \"Url\"\n            }\n        ],\n        \"orflag\": true,\n        \"screenshot\": false,\n        \"screenshotmultiple\": false,\n        \"screenshotsec\": 10,\n        \"popup\": false,\n        \"popuptext\": \"\",\n        \"email\": false,\n        \"emailto\": null,\n        \"emailsubject\": \"\",\n        \"emailbody\": \"\",\n        \"emailbounced\": false,\n        \"groups\": null,\n        \"groupNames\": null,\n        \"terminate\": false,\n        \"name\": \"_atomatedTesting\",\n        \"webhook\": false,\n        \"webhookurl\": \"\",\n        \"webhookprovider\": null,\n        \"webhookparam\": \"\",\n        \"weight\": 3,\n        \"video\": false,\n        \"conditionstext\": \"(Url Contains updated)\",\n        \"default\": false,\n        \"isUsb\": false,\n        \"allowedFields\": [\n            \"Computer\",\n            \"Description\",\n            \"DurationSeconds\",\n            \"Executable\",\n            \"IpAddress\",\n            \"LogonDomain\",\n            \"PrimaryDomain\",\n            \"Titlebar\",\n            \"Url\",\n            \"User\"\n        ]\n    }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/alarms/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response should not have errors\", function () {",
+									"    pm.response.to.not.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"Successful cleanup of environment variables for /alarms\", function () {",
+									"",
+									"    pm.environment.set('resourceId', '')",
+									"    pm.environment.set('tempResource', '')",
+									"",
+									"    const tempResource = pm.environment.get('tempResource')",
+									"    const resourceId = pm.environment.get('resourceId')",
+									"",
+									"    pm.expect(tempResource).to.eq(\"\");",
+									"    pm.expect(resourceId).to.eq(\"\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/alarms/fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response matches all alarm fields values\", function(){",
+									"    const res = pm.response.json();",
+									"",
+									"    const expectedKeyValues = ['Computer', \"Description\", \"DurationSeconds\", \"Executable\", \"IpAddress\", \"LogonDomain\", \"PrimaryDomain\", \"Titlebar\", \"Url\", \"User\", ]",
+									"",
+									"\tres.map(obj => {",
+									"\t\tutils.validateExpectedValue(expectedKeyValues, obj.value);",
+									"\t})",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms/fields",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms",
+								"fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/alarms/conditions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response matches all alarm conditions values\", function(){",
+									"    const res = pm.response.json();",
+									"",
+									"    const expectedKeyValues = ['Contains', \"DoesNotContain\", \"EndsWith\", \"EqualTo\", \"NotEqualTo\", \"StartsWith\", \"GreaterThan\"]",
+									"",
+									"\tres.map(obj => {",
+									"\t\tutils.validateExpectedValue(expectedKeyValues, obj.value);",
+									"\t})",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms/conditions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms",
+								"conditions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/alarms/users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has key named total and is of type number\", function(){",
+									"    const res = pm.response.json();",
+									"\tpm.expect(res).haveOwnProperty(\"total\");",
+									"\tutils.validateType(res.total, \"number\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/alarms/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alarms",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "agent",
+			"item": [
+				{
+					"name": "api/agents/count",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Agent count response is of type number\", function(){",
+									"    const res = pm.response.json();",
+									"\tutils.validateType(res, \"number\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/agents/count",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"agents",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/agent/timing/:computerId - ERROR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//  ERROR TBD",
+									"// https://dev-frontend-gcp-us.activtrak.com",
+									"",
+									"pm.test(\"Status code is 500\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/agent/logging/118",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"agent",
+								"logging",
+								"118"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/agent/health-ERROR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//  skipped to be finished.",
+									"",
+									"pm.test(\"Status code is 500\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/agent/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"agent",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "blocking",
+			"item": []
+		},
+		{
+			"name": "account",
+			"item": [
+				{
+					"name": "/account/plan",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response matches expected keys\", function(){",
+									"    const res = pm.response.json();",
+									"    const expectedKeys = ['planInfo', 'previousPlanInfo', 'currency', 'subscriptionAddOns', 'planAddOns', 'renewDate', 'isDowngrade']",
+									"",
+									"    pm.expect(res).to.have.keys(expectedKeys)  ",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/account/plan",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"account",
+								"plan"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "top-all",
+			"item": [
+				{
+					"name": "api/topapplications/totals",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response matches expected keys for topapplications totals\", function(){",
+									"    const res = pm.response.json();",
+									"    const expectedKeys = ['totalAppTime', \"totalProductiveTime\", \"totalProductiveActiveTime\", \"totalProductivePassiveTime\", \"totalUnproductiveTime\", \"totalUnproductiveActiveTime\", \"totalUnproductivePassiveTime\", \"totalUndefinedTime\", \"totalUndefinedActiveTime\", \"totalUndefinedPassiveTime\"]",
+									"\tutils.validateExpectedKeys(res, expectedKeys);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/topapplications/totals",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"topapplications",
+								"totals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/topcategories/totals Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"// this endpoint is currently being wored upon",
+									"",
+									"// pm.test(\"Status code is 200\", function () {",
+									"//     pm.response.to.have.status(200);",
+									"// });",
+									"",
+									"",
+									"// pm.test(\"Response matches expected keys for topapplications totals\", function(){",
+									"//     const res = pm.response.json();",
+									"//     const expectedKeys = ['totalAppTime', \"totalProductiveTime\", \"totalProductiveActiveTime\", \"totalProductivePassiveTime\", \"totalUnproductiveTime\", \"totalUnproductiveActiveTime\", \"totalUnproductivePassiveTime\", \"totalUndefinedTime\", \"totalUndefinedActiveTime\", \"totalUndefinedPassiveTime\"]",
+									"// \tutils.validateExpectedKeys(res, expectedKeys);",
+									"// });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": ""
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/topcategories/totals",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"topcategories",
+								"totals"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "_TEMP",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/settings/roleacces",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"settings",
+						"roleacces"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{authToken}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "Authorization",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Utils available for each collection request.",
+					"// Note: If you are using multiple functions make sure the calling fn is definded with function keyword.",
+					"utils = {",
+					"  _globalFnExample: function() {",
+					"    return 'globalFnExample called!';",
+					"  },",
+					"  validateExpectedKeys: (obj, arrayWithKeys) => {",
+					"            for (let key of arrayWithKeys) {",
+					"                pm.expect(obj).haveOwnProperty(key)",
+					"            }",
+					"    },",
+					"\tvalidateLargeSampleLimit: function(sample, sampleLimit, expectedKeys) {",
+					"\t\tif (sample.length < sampleLimit) {",
+					"\t\t\tsample.map(obj => {",
+					"\t\t\t\tthis.validateExpectedKeys(obj, expectedKeys);",
+					"\t\t\t}) ",
+					"\t\t\t",
+					"\t\t} else {",
+					"\t\t\t// Guard if sample is too big.",
+					"\t\t\tlet counter = 0;",
+					"\t\t\twhile (counter <= sample.length){",
+					"\t\t\t\tsample.map(obj => {",
+					"\t\t\t\t\tthis.validateExpectedKeys(obj, expectedKeys);",
+					"\t\t\t\t\tcounter++;",
+					"\t\t\t\t}) ",
+					"\t\t\t}",
+					"\t\t}",
+					"\t},",
+					"\tvalidateExpectedValue: (expectedValues, value) => {",
+					"\t\tpm.expect(expectedValues).to.include(value);",
+					"\t},",
+					"\tvalidateType: (value, type) => {",
+					"\t\tpm.expect(value).to.be.a(type);",
+					"\t},",
+					"\tvalidateValueMultipleTypes: (value, arrayOfTypes) => {",
+					"\t\tpm.expect(typeof value).to.be.oneOf(arrayOfTypes);",
+					"\t},",
+					"};"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/"
+		}
+	]
+}
